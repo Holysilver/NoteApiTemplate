@@ -10,11 +10,13 @@ class UserModel(db.Model):
     username = db.Column(db.String(32), unique=True)
     password_hash = db.Column(db.String(128))
     notes = db.relationship('NoteModel', backref='author', lazy='dynamic')
-    is_staff = db.Column(db.Boolean(), default=False, server_default="false", nullable=False)
+    is_staff = db.Column(db.Boolean(), default=False, server_default="false", nullable=False)   # является ли пользователь сотрудником
     role = db.Column(db.String(32), nullable=False, server_default="simple_user", default="simple_user")
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, is_staff=False, role="simple_user"):
         self.username = username
+        self.is_staff = is_staff
+        self.role = role
         self.hash_password(password)
 
     def hash_password(self, password):

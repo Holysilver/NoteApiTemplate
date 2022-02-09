@@ -83,13 +83,47 @@ class TestUsers(TestCase):
         """
         Проверяет невозможность создания нескольких пользователей с одинаковым username
         """
-        pass
+        user_data = {
+            "username": 'admin',
+            'password': 'admin'
+        }
+        # res = self.client.post('/users',
+        #                        data=json.dumps(user_data),
+        #                        content_type='application/json')
+        # ПЕРЕПИСАТЬ НА uSERmODEL
+        # data = json.loads(res.data)
+        # self.assertEqual(res.status_code, 201)
+        res = self.client.post('/users',
+                               data=json.dumps(user_data),
+                               content_type='application/json')
+        self.assertEqual(res.status_code, 400)
+        # можно с count
+        self.assertEqual(db.session.query(UserModel).count(), 1)
+
 
     def test_edit_user(self):
         """
         Редактирование пользователя
         """
-        pass
+        user_data = {
+            "username": 'admin',
+            'password': 'admin'
+        }
+        user = UserModel(**user_data)
+        user.save()
+        edit_user_data = {
+            "password": "new password",
+            "is_staff": True
+        }
+        res = self.client.put(f'/users/{user.id}',
+                               data=json.dumps(edit_user_data),
+                               content_type='application/json')
+        self.assertEqual(res.status_code, 201)
+        edited_user = UserModel.query.get(user.id)
+        self.assertTrue(edited_user.verify_password(edit_user_data["password"]))
+        self.assertEqual(edit_user_data["is_staff"], edited_user.is_staff)
+
+
 
     def test_delete_user(self):
         """
@@ -133,7 +167,7 @@ class TestNotes(TestCase):
                 f"{user_data['username']}:{user_data['password']}".encode('ascii')).decode('utf-8')
         }
 
-    def test_create_node(self):
+    def test_create_note(self):
         note_data = {
             "text": 'Test note 1',
             "private": False
@@ -213,8 +247,6 @@ class TestNotes(TestCase):
         Получение заметки с несуществующим id
         """
         pass
-
-
 
     def test_private_public_notes(self):
         """
