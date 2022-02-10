@@ -11,3 +11,5 @@ gunicorn
 psycopg2-binary
 passlib
 flasgger
+apispec
+flask_apispec
