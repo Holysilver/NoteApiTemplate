@@ -1,9 +1,13 @@
+from flask_restful import marshal_with
 from api import auth, abort, g, Resource, reqparse
 from api.models.note import NoteModel
-from api.schemas.note import note_schema, notes_schema
+from api.schemas.note import note_schema, notes_schema, NoteSchema, NoteRequestSchema
+from flask_apispec import doc, marshal_with, use_kwargs
+from flask_apispec.views import MethodResource
 
 
-class NoteResource(Resource):
+@doc(tags=["Notes"])
+class NoteResource(MethodResource):
     @auth.login_required
     def get(self, note_id):
         """
@@ -55,20 +59,20 @@ class NoteResource(Resource):
         return note_schema.dump(note), 200
 
 
-class NotesListResource(Resource):
+@doc(tags=["Notes"])
+class NotesListResource(MethodResource):
     def get(self):
         notes = NoteModel.query.all()
         return notes_schema.dump(notes), 200
 
+    @doc(summary="Create Note", description="Create new Note for current authentication")
+    @doc(security=[{"basicAuth": []}])
+    @marshal_with(NoteSchema, code=201)
+    @doc(responses={400: {"description": 'bad request'}})
+    @use_kwargs(NoteRequestSchema, location="json")
     @auth.login_required
-    def post(self):
+    def post(self, **kwargs):
         author = g.user
-        parser = reqparse.RequestParser()
-        parser.add_argument("text", required=True)
-        # Подсказка: чтобы разобраться с private="False",
-        #   смотрите тут: https://flask-restful.readthedocs.io/en/latest/reqparse.html#request-parsing
-        parser.add_argument("private", type=bool, required=True)
-        note_data = parser.parse_args()
-        note = NoteModel(author_id=author.id, **note_data)
+        note = NoteModel(author_id=author.id, **kwargs)
         note.save()
-        return note_schema.dump(note), 201
+        return note, 201
