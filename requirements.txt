@@ -10,3 +10,4 @@ ipython
 gunicorn
 psycopg2-binary
 passlib
+flasgger
