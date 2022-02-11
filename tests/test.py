@@ -282,6 +282,29 @@ class TestNotes(TestCase):
         """
         Редактирование заметки
         """
+        note_data = {"text": "Text_old"}
+        note = NoteModel(author_id=self.user.id, **note_data)
+        note.save()
+
+        print("note text", note.text)
+
+        edit_note_data = {
+            "text": "New text",
+            "private": False
+        }
+
+        res = self.client.put(f'/notes/{note.id}',
+                        data=json.dumps(edit_note_data),
+                        content_type='application/json',
+                        headers=self.headers)
+
+        edited_note = NoteModel.query.get(note.id)
+        # print("edit note private = ", edited_note.private)
+        # print("edit note text = ", edited_note.text)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(edited_note.private)
+        self.assertEqual(edit_note_data["text"], edited_note.text)
 
     def test_delete_note(self):
         """
