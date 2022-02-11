@@ -1,9 +1,11 @@
 from flask_restful import marshal_with
 from api import auth, abort, g, Resource, reqparse
 from api.models.note import NoteModel
+from api.models.tag import TagModel
 from api.schemas.note import note_schema, notes_schema, NoteSchema, NoteRequestSchema
 from flask_apispec import doc, marshal_with, use_kwargs
 from flask_apispec.views import MethodResource
+from webargs import fields
 
 
 @doc(tags=["Notes"])
@@ -76,3 +78,23 @@ class NotesListResource(MethodResource):
         note = NoteModel(author_id=author.id, **kwargs)
         note.save()
         return note, 201
+
+
+@doc(tags=["Notes"])
+class NotesAddTagResource(MethodResource):
+
+    @doc(summary="Add tags to note")
+    @use_kwargs({"tags": fields.List(fields.Int())})
+    def put(self, note_id, **kwargs):
+        # print("kwargs = ", kwargs)
+        note = NoteModel.query.get(note_id)
+        if not note:
+            abort(404, error=f"note {note_id} not found")
+        # TagModel.query.filter(TagModel.id.in_(kwargs["tags"])).all()      # ЛУЧШЕ ТАК!!!
+
+        for tag_id in kwargs["tags"]:
+            tag = TagModel.query.get(tag_id)        #работает медленно... Лучше получить сразу список
+            note.tags.append(tag)
+
+        note.save()
+        return {}

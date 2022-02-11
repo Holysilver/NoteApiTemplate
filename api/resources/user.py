@@ -58,6 +58,7 @@ class UserResource(MethodResource):
         tags:
             - Users
         """
+        # переделать на use kwargs
         parser = reqparse.RequestParser()
         parser.add_argument("username", required=True)
         user_data = parser.parse_args()
