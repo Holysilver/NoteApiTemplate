@@ -98,3 +98,11 @@ class NotesAddTagResource(MethodResource):
 
         note.save()
         return {}
+
+
+@doc(tags=["Notes"])
+class NotesFilterResource(MethodResource):
+    # GET: /notes/filter?tags=[tag-1, tag-2, ...]
+    @use_kwargs({"tags": fields.List(fields.Str())}, location=("query"))
+    def get(self, **kwargs):
+        pass
