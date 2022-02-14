@@ -105,4 +105,10 @@ class NotesFilterResource(MethodResource):
     # GET: /notes/filter?tags=[tag-1, tag-2, ...]
     @use_kwargs({"tags": fields.List(fields.Str())}, location=("query"))
     def get(self, **kwargs):
+        tag_names = kwargs["tags"]      #List
+        # TODO не доделано!!!
+        tags = TagModel.query.filter(TagModel.name.in_(kwargs["tags"])).all()
+        print(tags)
+        notes = NoteModel.query.filter(NoteModel.tags.any()).all()
+
         pass
