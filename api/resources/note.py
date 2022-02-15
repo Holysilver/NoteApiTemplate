@@ -1,4 +1,6 @@
 from flask_restful import marshal_with
+
+from Helpers.shortcuts import get_or_404
 from api import auth, abort, g, Resource, reqparse
 from api.models.note import NoteModel
 from api.models.tag import TagModel
@@ -33,9 +35,10 @@ class NoteResource(MethodResource):
         parser.add_argument("text", required=True)
         parser.add_argument("private", type=bool)
         note_data = parser.parse_args()
-        note = NoteModel.query.get(note_id)
-        if not note:
-            abort(404, error=f"note {note_id} not found")
+        # note = NoteModel.query.get(note_id)
+        # if not note:
+        #     abort(404, error=f"note {note_id} not found")
+        note = get_or_404(NoteModel, note_id)
         if note.author != author:
             abort(403, error=f"Forbidden")
         note.text = note_data["text"]
@@ -57,7 +60,6 @@ class NoteResource(MethodResource):
         if note.author != author:
             abort(403, error=f"Forbidden")
         note.delete()
-        # raise NotImplemented("Метод не реализован")
         return note_schema.dump(note), 200
 
 
