@@ -1,4 +1,5 @@
 from api import db, Config, ma
+import logging
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
@@ -34,6 +35,7 @@ class UserModel(db.Model):
             db.session.add(self)
             db.session.commit()
         except IntegrityError:  # Обработка ошибки "создание пользователя с НЕ уникальным именем"
+            logging.warning("UserName is not unique")
             db.session.rollback()
 
     def delete(self):

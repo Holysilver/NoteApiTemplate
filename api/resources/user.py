@@ -1,4 +1,5 @@
 from api import Resource, abort, reqparse, auth
+import logging
 from api.models.user import UserModel
 from api.schemas.user import user_schema, users_schema, UserSchema, UserRequestSchema
 from flask_apispec.views import MethodResource
@@ -85,4 +86,5 @@ class UsersListResource(MethodResource):
         user.save()
         if not user.id:
             abort(400, error=f"User with username:{user.username} already exist")
+        logging.info("User created successful")
         return user, 201
