@@ -93,7 +93,7 @@ class NotesAddTagResource(MethodResource):
         # TagModel.query.filter(TagModel.id.in_(kwargs["tags"])).all()      # ЛУЧШЕ ТАК!!!
 
         for tag_id in kwargs["tags"]:
-            tag = TagModel.query.get(tag_id)        #работает медленно... Лучше получить сразу список
+            tag = TagModel.query.get(tag_id)  # работает медленно... Лучше получить сразу список
             note.tags.append(tag)
 
         note.save()
@@ -104,11 +104,9 @@ class NotesAddTagResource(MethodResource):
 class NotesFilterResource(MethodResource):
     # GET: /notes/filter?tags=[tag-1, tag-2, ...]
     @use_kwargs({"tags": fields.List(fields.Str())}, location=("query"))
+    @marshal_with(NoteSchema)
     def get(self, **kwargs):
-        tag_names = kwargs["tags"]      #List
-        # TODO не доделано!!!
+        tag_names = kwargs["tags"]  # List
         tags = TagModel.query.filter(TagModel.name.in_(kwargs["tags"])).all()
-        print(tags)
-        notes = NoteModel.query.filter(NoteModel.tags.any()).all()
-
-        pass
+        notes = NoteModel.query.join(NoteModel.tags).filter(TagModel.name.in_(kwargs["tags"])).all()
+        return notes
