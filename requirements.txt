@@ -13,3 +13,4 @@ passlib
 flasgger
 apispec
 flask_apispec
+flask-babel

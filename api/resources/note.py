@@ -12,18 +12,20 @@ from webargs import fields
 
 @doc(tags=["Notes"])
 class NoteResource(MethodResource):
+    @marshal_with(NoteSchema, code=200)
     @auth.login_required
     def get(self, note_id):
         """
         Пользователь может получить ТОЛЬКО свою заметку
         """
         author = g.user
-        note = NoteModel.query.get(note_id)
-        if not note:
-            abort(404, error=f"Note with id={note_id} not found")
+        # note = NoteModel.query.get(note_id)
+        # if not note:
+        #     abort(404, error=f"Note with id={note_id} not found")
+        note = get_or_404(NoteModel, note_id)
         if note.author != author:
             abort(403, error=f"Forbidden")
-        return note_schema.dump(note), 200
+        return note, 200
 
     @auth.login_required
     def put(self, note_id):
@@ -48,16 +50,21 @@ class NoteResource(MethodResource):
         note.save()
         return note_schema.dump(note), 200
 
+    @doc(summary="Delete Note", description="Note to archive")
+    @doc(security=[{"basicAuth": []}])
     @auth.login_required
     def delete(self, note_id):
         """
         Пользователь может удалять ТОЛЬКО свои заметки
         """
-        author = g.user
-        note = NoteModel.query.get(note_id)
-        if not note:
-            abort(404, error=f"note {note_id} not found")
-        if note.author != author:
+        auth_user = g.user
+        # note = get_or_404(NoteModel, note_id)
+        # if not note:
+        #     abort(404, error=f"note {note_id} not found")
+        # if note.author != author:
+        #     abort(403, error=f"Forbidden")
+        note = get_or_404(NoteModel, note_id)
+        if note.author != auth_user:
             abort(403, error=f"Forbidden")
         note.delete()
         return note_schema.dump(note), 200
@@ -112,3 +119,13 @@ class NotesFilterResource(MethodResource):
         tags = TagModel.query.filter(TagModel.name.in_(kwargs["tags"])).all()
         notes = NoteModel.query.join(NoteModel.tags).filter(TagModel.name.in_(kwargs["tags"])).all()
         return notes
+
+
+@doc(tags=["Notes"])
+class NoteRestoreResource(MethodResource):
+    @doc(summary="Restore note")
+    @marshal_with(NoteSchema)
+    def put(self, note_id):
+        note = get_or_404(NoteModel, note_id)
+        note.restore()
+        return note, 200

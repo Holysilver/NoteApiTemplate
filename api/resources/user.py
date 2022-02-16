@@ -1,3 +1,4 @@
+from Helpers.shortcuts import get_or_404
 from api import Resource, abort, reqparse, auth
 import logging
 from api.models.user import UserModel
@@ -51,7 +52,10 @@ class UserResource(MethodResource):
         return user, 200
 
     @auth.login_required(role="admin")
-    def put(self, user_id):
+
+    @marshal_with(UserSchema, code=200)
+    @use_kwargs(UserRequestSchema, location=("json"))
+    def put(self, user_id, **kwargs):
         # language=YAML
         """
         Edit User by id
@@ -60,11 +64,15 @@ class UserResource(MethodResource):
             - Users
         """
         # переделать на use kwargs
-        parser = reqparse.RequestParser()
-        parser.add_argument("username", required=True)
-        user_data = parser.parse_args()
-        user = UserModel.query.get(user_id)
-        user.username = user_data["username"]
+        # parser = reqparse.RequestParser()
+        # parser.add_argument("username", required=True)
+        # user_data = parser.parse_args()
+        # user = UserModel.query.get(user_id)
+        # user.username = user_data["username"]
+        user = get_or_404(UserModel, user_id)
+
+        for key,value in kwargs.items():
+            setattr(user, key, value)
         user.save()
         return user_schema.dump(user), 200
 

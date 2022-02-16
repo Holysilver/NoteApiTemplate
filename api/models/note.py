@@ -1,3 +1,5 @@
+from sqlalchemy.sql import expression
+
 from api import db
 from api.models.user import UserModel
 from api.models.tag import TagModel
@@ -14,12 +16,18 @@ class NoteModel(db.Model):
     text = db.Column(db.String(255), unique=False, nullable=False)
     private = db.Column(db.Boolean(), default=True, nullable=False)
     tags = db.relationship(TagModel, secondary=tags, lazy='subquery', backref=db.backref('notes', lazy=True))
-    archive = db.Column(db.Boolean(), default=False, nullable=False, serverdefault="false")
+    archived = db.Column(db.Boolean(), default=False, nullable=False, server_default=expression.false())
 
     def save(self):
         db.session.add(self)
         db.session.commit()
 
+    def restore(self):
+        self.archived = False
+        db.session.add(self)
+        db.session.commit()
+
     def delete(self):
-        self.archive = True
+        self.archived = True
+        db.session.add(self)
         db.session.commit()
