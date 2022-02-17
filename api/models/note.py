@@ -18,6 +18,11 @@ class NoteModel(db.Model):
     tags = db.relationship(TagModel, secondary=tags, lazy='subquery', backref=db.backref('notes', lazy=True))
     archived = db.Column(db.Boolean(), default=False, nullable=False, server_default=expression.false())
 
+    @classmethod
+    def not_archive(cls):
+        return cls.query.filter_by(archived=False)
+
+
     def save(self):
         db.session.add(self)
         db.session.commit()

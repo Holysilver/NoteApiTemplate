@@ -40,7 +40,10 @@ class NoteResource(MethodResource):
         # note = NoteModel.query.get(note_id)
         # if not note:
         #     abort(404, error=f"note {note_id} not found")
-        note = get_or_404(NoteModel, note_id)
+        # note = get_or_404(NoteModel, note_id)
+        note = NoteModel.not_archive().get(note_id)
+        if not note:
+            abort(404, error=f"note {note_id} not found")
         if note.author != author:
             abort(403, error=f"Forbidden")
         note.text = note_data["text"]
@@ -73,7 +76,7 @@ class NoteResource(MethodResource):
 @doc(tags=["Notes"])
 class NotesListResource(MethodResource):
     def get(self):
-        notes = NoteModel.query.all()
+        notes = NoteModel.not_archive().query.all()
         return notes_schema.dump(notes), 200
 
     @doc(summary="Create Note", description="Create new Note for current authentication")
