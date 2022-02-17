@@ -1,8 +1,8 @@
-"""Note archived
+"""newwww
 
-Revision ID: 2034438d90b4
+Revision ID: fa39f8d3cdbb
 Revises: 
-Create Date: 2022-02-16 19:15:25.384539
+Create Date: 2022-02-17 19:12:21.988683
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2034438d90b4'
+revision = 'fa39f8d3cdbb'
 down_revision = None
 branch_labels = None
 depends_on = None
