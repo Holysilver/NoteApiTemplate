@@ -76,7 +76,7 @@ class NoteResource(MethodResource):
 @doc(tags=["Notes"])
 class NotesListResource(MethodResource):
     def get(self):
-        notes = NoteModel.not_archive().query.all()
+        notes = NoteModel.not_archive().all()
         return notes_schema.dump(notes), 200
 
     @doc(summary="Create Note", description="Create new Note for current authentication")

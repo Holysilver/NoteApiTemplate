@@ -10,7 +10,7 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), unique=True)
     password_hash = db.Column(db.String(128))
-    notes = db.relationship('NoteModel', backref='author', lazy='dynamic')
+    notes = db.relationship('NoteModel', backref=db.backref('author'), lazy='dynamic')
     is_staff = db.Column(db.Boolean(), default=False, server_default="false", nullable=False)   # является ли пользователь сотрудником
     role = db.Column(db.String(32), nullable=False, server_default="simple_user", default="simple_user")
 

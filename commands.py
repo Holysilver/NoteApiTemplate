@@ -51,3 +51,22 @@ def remove_user(username, all):
         return
     UserModel.delete(user)
     print(f"User with name={username} successfully deleted")
+
+
+@app.cli.command('add-list')
+def listusers():
+    """
+    add list users from practice
+    """
+    users = [
+        {"id": 1, "username": "SuperMan"},
+        {"id": 2, "username": "Megaman"},
+        {"id": 3, "username": "Admin"},
+        {"id": 6, "username": "spiderman"},
+        {"id": 8, "username": "User"},
+        {"id": 9, "username": "NewUser"},
+    ]
+    for u in users:
+        user = UserModel(u["username"], u["username"])
+        user.id = u["id"]
+        user.save()
