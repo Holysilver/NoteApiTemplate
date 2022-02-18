@@ -18,6 +18,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(BASE_DIR, 'base.db')
     TEST_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'test.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # Зачем эта настройка: https://flask-sqlalchemy-russian.readthedocs.io/ru/latest/config.html#id2
+    SQLALCHEMY_ECHO = True      # Добавление показа в терминале всего SQL кода.
     DEBUG = True
     PORT = 5000
     SECRET_KEY = "My secret key =)"
