@@ -1,15 +1,22 @@
 import os
+from pathlib import Path
 
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 
-base_dir = os.path.dirname(os.path.abspath(__file__))  # TODO ПЕРЕПИСАТЬ НА Pathlib
+ # TODO ПЕРЕПИСАТЬ НА Pathlib
 
+BASE_DIR = Path(__file__).parent
+security_definitions = {
+    "basicAuth": {
+        "type": "basic"
+    }
+}
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(base_dir, 'base.db')
-    TEST_DATABASE_URI = 'sqlite:///' + os.path.join(base_dir, 'test.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(BASE_DIR, 'base.db')
+    TEST_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'test.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # Зачем эта настройка: https://flask-sqlalchemy-russian.readthedocs.io/ru/latest/config.html#id2
     DEBUG = True
     PORT = 5000

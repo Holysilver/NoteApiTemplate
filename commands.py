@@ -1,6 +1,12 @@
+import json
+from sqlite3 import IntegrityError
+
 import click
 from api import app, db
 from api.models.user import UserModel
+from api.models.note import NoteModel
+from api.schemas.user import UserRequestSchema
+from config import BASE_DIR
 
 
 @app.cli.command('createsuperuser')
@@ -70,3 +76,31 @@ def listusers():
         user = UserModel(u["username"], u["username"])
         user.id = u["id"]
         user.save()
+
+
+@app.cli.command('fixture')
+@click.argument('param')
+def fixtures(param):
+    path_to_fixture = BASE_DIR / 'fixtures' / 'notes.json'
+    with open(path_to_fixture, "r", encoding="UTF-8") as f:
+        models = {
+            "NoteModel": NoteModel,
+            "UserModel": UserModel
+        }
+        file_data = json.load(f)
+        model_name = file_data["model"]
+        for obj_data in file_data["records"]:
+            obj = models[model_name](**obj_data)
+            db.session.add(obj)
+        db.session.commit()
+    #     users_data = UserRequestSchema(many=True).loads(f.read())
+    #     for user_data in users_data:
+    #         user = UserModel(**user_data)
+    #         db.session.add(user)
+    #         try:
+    #             db.session.commit()
+    #         except IntegrityError:
+    #             db.session.rollback()
+    #             print(f'User {user.username} already exists')
+    #     db.session.commit()
+    # print(f"{len(users_data)} users created")
